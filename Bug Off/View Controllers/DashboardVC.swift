@@ -1,13 +1,13 @@
 //
-//  DashboardViewController.swift
+//  DashboardVC.swift
 //  Bug Off
 //
-//  Created by Rakil Ahmed on 3/30/22.
+//  Created by Rakil Ahmed on 4/6/22.
 //
 
 import UIKit
 
-class DashboardViewController: UIViewController {
+class DashboardVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

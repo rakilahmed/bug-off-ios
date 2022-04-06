@@ -9,7 +9,7 @@ import UIKit
 import Firebase
 import FirebaseAuth
 
-class RegisterViewController: UIViewController {
+class RegisterVC: UIViewController {
     
     @IBOutlet weak var errorLabel: UILabel!
     @IBOutlet weak var fullNameTextField: UITextField!
@@ -45,12 +45,17 @@ class RegisterViewController: UIViewController {
         return nil
     }
     
+    func showError(_ message:String) {
+        errorLabel.text = message
+        errorLabel.alpha = 1
+    }
+    
     @IBAction func registerTapped(_ sender: Any) {
         let error = validateFields()
         if error != nil {
             showError(error!)
         } else {
-//            let fullName = fullNameTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
+            let fullName = fullNameTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             let email = emailTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             let password = passwordTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
                     
@@ -58,20 +63,19 @@ class RegisterViewController: UIViewController {
                 if err != nil {
                     self.showError("Error creating user")
                 } else {
-                    self.transitionToHome()
+                    UserDefaults.standard.set(false, forKey: "authStatus")
+                    
+                    let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
+                    changeRequest?.displayName = fullName
+                    changeRequest?.commitChanges { error in
+                        print("-> Error changing displayName <-")
+                    }
+                    
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let tabBarVC = storyboard.instantiateViewController(identifier: "tabBarVC")
+                    (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootVC(tabBarVC)
                 }
             }
         }
-    }
-    
-    func showError(_ message:String) {
-        errorLabel.text = message
-        errorLabel.alpha = 1
-    }
-        
-    func transitionToHome() {
-        let dashboardViewController = storyboard?.instantiateViewController(identifier: "dashboardVC") as? DashboardViewController
-        view.window?.rootViewController = dashboardViewController
-        view.window?.makeKeyAndVisible()
     }
 }

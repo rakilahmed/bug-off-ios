@@ -9,7 +9,7 @@ import UIKit
 import Firebase
 import FirebaseAuth
 
-class LoginViewController: UIViewController {
+class LoginVC: UIViewController {
     @IBOutlet weak var errorLabel: UILabel!
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
@@ -49,9 +49,10 @@ class LoginViewController: UIViewController {
                     self.errorLabel.text = error!.localizedDescription
                     self.errorLabel.alpha = 1
                 } else {
-                    let dashboardViewController = self.storyboard?.instantiateViewController(identifier: "dashboardVC") as? DashboardViewController
-                    self.view.window?.rootViewController = dashboardViewController
-                    self.view.window?.makeKeyAndVisible()
+                    UserDefaults.standard.set(true, forKey: "authStatus")
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let tabBarVC = storyboard.instantiateViewController(identifier: "tabBarVC")
+                    (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootVC(tabBarVC)
                 }
             }
         }
