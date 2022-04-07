@@ -30,10 +30,15 @@ class LoginVC: UIViewController {
     func validateFields() -> String? {
         if  emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" ||
             passwordTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
-            return "Please fill in all fields."
+            return "Please fill in all fields"
         }
         
         return nil
+    }
+    
+    func showError(_ message:String) {
+        errorLabel.text = message
+        errorLabel.alpha = 1
     }
     
     @IBAction func loginTapped(_ sender: Any) {
@@ -50,16 +55,9 @@ class LoginVC: UIViewController {
                     self.errorLabel.alpha = 1
                 } else {
                     UserDefaults.standard.set(true, forKey: "authStatus")
-                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                    let tabBarVC = storyboard.instantiateViewController(identifier: "tabBarVC")
-                    (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootVC(tabBarVC)
+                    Utilities.updateRootVC()
                 }
             }
         }
-    }
-    
-    func showError(_ message:String) {
-        errorLabel.text = message
-        errorLabel.alpha = 1
     }
 }

@@ -34,12 +34,12 @@ class RegisterVC: UIViewController {
         if fullNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" ||
             emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" ||
             passwordTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
-            return "Please fill in all fields."
+            return "Please fill in all fields"
         }
         
         let checkPassword = passwordTextField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
         if Utilities.isPasswordValid(checkPassword) == false {
-            return "Please make sure your password is at least 6 characters or more."
+            return "Please make sure your password is at least 6 characters or more"
         }
         
         return nil
@@ -63,7 +63,7 @@ class RegisterVC: UIViewController {
                 if err != nil {
                     self.showError("Error creating user")
                 } else {
-                    UserDefaults.standard.set(false, forKey: "authStatus")
+                    UserDefaults.standard.set(true, forKey: "authStatus")
                     
                     let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
                     changeRequest?.displayName = fullName
@@ -71,9 +71,7 @@ class RegisterVC: UIViewController {
                         print("-> Error changing displayName <-")
                     }
                     
-                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                    let tabBarVC = storyboard.instantiateViewController(identifier: "tabBarVC")
-                    (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootVC(tabBarVC)
+                    Utilities.updateRootVC()
                 }
             }
         }
