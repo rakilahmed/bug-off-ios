@@ -19,6 +19,7 @@ class UpdateProfileVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.largeTitleDisplayMode = .never
         title = "Update Profile"
         currentNameLabel.text = Auth.auth().currentUser?.displayName
         currentEmailLabel.text = Auth.auth().currentUser?.email
