@@ -12,9 +12,9 @@ import FirebaseAuth
 class ProfileVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var logoutButton: UIButton!
-
+    
     let items = ["Update Profile", "Change Password"]
-
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
     }
@@ -47,8 +47,9 @@ class ProfileVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBAction func logoutTapped(_ sender: Any) {
         do {
-            UserDefaults.standard.set(false, forKey: "authStatus")
             try Auth.auth().signOut()
+            UserDefaults.standard.set(false, forKey: "authStatus")
+            UserDefaults.standard.set(0, forKey: "selectedTab")
             Utilities.updateRootVC()
             print("-> Logged out successfully <-")
         } catch {
