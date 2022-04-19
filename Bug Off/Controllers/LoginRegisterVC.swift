@@ -57,8 +57,12 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return section == 0 ? 1.0 : 32
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return section == 0 ? 1.0 : 32
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -70,7 +74,7 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
         let registerHiddenRows = [4, 7]
         
         if indexPath.row == 0 {
-            return tableView.bounds.height * 0.2
+            return tableView.bounds.height * 0.3
         }
         
         if loginState {

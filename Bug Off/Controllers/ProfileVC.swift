@@ -9,11 +9,23 @@ import UIKit
 import Firebase
 import FirebaseAuth
 
+var toggle = true
+
 class ProfileVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var logoutButton: UIButton!
     
     let items = ["Update Profile", "Change Password"]
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupElements()
+    }
+    
+    func setupElements() {
+        title = "Profile"
+        Utilities.styleHollowButton(logoutButton)
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
@@ -29,20 +41,10 @@ class ProfileVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if items[indexPath.row] == "Update Profile" {
-            let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let updateProfileVC = storyBoard.instantiateViewController(withIdentifier: "updateProfileVC")
-            self.navigationController?.pushViewController(updateProfileVC, animated: true)
+            toggle = true
+        } else if items[indexPath.row] == "Change Password" {
+            toggle = false
         }
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        title = "Profile"
-        setupElements()
-    }
-    
-    func setupElements() {
-        Utilities.styleHollowButton(logoutButton)
     }
     
     @IBAction func logoutTapped(_ sender: Any) {
