@@ -23,7 +23,7 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
     }
     
     func setupElements() {
-        title = toggle ? "Update Profile" : "Change Password"
+        title = toggle ? "Chnage Name or Email" : "Change Password"
         saveButton.isEnabled = false
         currentName.text = Auth.auth().currentUser?.displayName
         currentEmail.text = Auth.auth().currentUser?.email
@@ -97,13 +97,21 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
             let newEmail = newEmailField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             
             if !newName.isEmpty && newName != currentName.text {
+                if newName.count < 3 {
+                    showAlert(title: "Failed to Change Name", message: "Please make sure your name is at least 3 characters or more.")
+                }
+                
                 let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
                 changeRequest?.displayName = newName
                 changeRequest?.commitChanges()
-            } else if !newEmail.isEmpty && newEmail != currentEmail.text {
-                Auth.auth().currentUser?.updateEmail(to: newEmail)
-            } else {
-                showAlert(title: "Faild to Update Profile", message: "Something went wrong, try again!")
+            }
+            
+            if !newEmail.isEmpty && newEmail != currentEmail.text {
+                Auth.auth().currentUser?.updateEmail(to: newEmail) { (error) in
+                    if error != nil {
+                        self.showAlert(title: "Failed to Change Email", message: "\(error!.localizedDescription)")
+                    }
+                }
             }
         } else {
             let newPassword = newPasswordField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -119,12 +127,9 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
                         }
                     }
                 }
-            } else {
-                showAlert(title: "Uh Oh!", message: "Something went wrong, try again!")
             }
         }
         
         self.navigationController?.popViewController(animated: true)
     }
-    
 }

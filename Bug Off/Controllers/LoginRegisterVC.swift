@@ -132,6 +132,10 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
                 return "Please fill in all the fields."
             }
             
+            if nameField.text!.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 {
+                return "Please make sure your name is at least 3 characters or more."
+            }
+            
             let checkPassword = passwordField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             if Utilities.isPasswordValid(checkPassword) == false {
                 return "Please make sure your password is at least 6 characters or more."

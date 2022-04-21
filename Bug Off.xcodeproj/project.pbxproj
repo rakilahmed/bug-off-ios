@@ -21,7 +21,7 @@
 		8DCD7D6227F4F1950012803F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8DCD7D6027F4F1950012803F /* Main.storyboard */; };
 		8DCD7D6427F4F1970012803F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8DCD7D6327F4F1970012803F /* Assets.xcassets */; };
 		8DCD7D6727F4F1970012803F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8DCD7D6527F4F1970012803F /* LaunchScreen.storyboard */; };
-		8DF5C6B328072A20006A08A6 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF5C6B228072A20006A08A6 /* API.swift */; };
+		8DF5C6B328072A20006A08A6 /* TicketsData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF5C6B228072A20006A08A6 /* TicketsData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,7 +40,7 @@
 		8DCD7D6327F4F1970012803F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8DCD7D6627F4F1970012803F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8DCD7D6827F4F1970012803F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8DF5C6B228072A20006A08A6 /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		8DF5C6B228072A20006A08A6 /* TicketsData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketsData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +55,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8D1DFB5828116E670061C322 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				8DF5C6B228072A20006A08A6 /* TicketsData.swift */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
 		8D400B4027F4F3840000377D /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -81,7 +89,6 @@
 			isa = PBXGroup;
 			children = (
 				8DC256A527F5069400CE6879 /* Utilities.swift */,
-				8DF5C6B228072A20006A08A6 /* API.swift */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -106,6 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				8DC256A427F5066300CE6879 /* Config */,
+				8D1DFB5828116E670061C322 /* API */,
 				8D400B4027F4F3840000377D /* Controllers */,
 				8DCD7D5A27F4F1950012803F /* AppDelegate.swift */,
 				8DCD7D6027F4F1950012803F /* Main.storyboard */,
@@ -198,7 +206,7 @@
 			files = (
 				8DB60E382807407200BE247D /* TicketCell.swift in Sources */,
 				8D1E648427FD7A2600936FFF /* ProfileVC.swift in Sources */,
-				8DF5C6B328072A20006A08A6 /* API.swift in Sources */,
+				8DF5C6B328072A20006A08A6 /* TicketsData.swift in Sources */,
 				8D1E648627FD7A3D00936FFF /* TicketsVC.swift in Sources */,
 				8D45A36128041CED00B5356C /* LoginRegisterVC.swift in Sources */,
 				8DC256A627F5069400CE6879 /* Utilities.swift in Sources */,

@@ -15,7 +15,7 @@ class ProfileVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var logoutButton: UIButton!
     
-    let items = ["Update Profile", "Change Password"]
+    let items = ["Chnage Name or Email", "Change Password"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,7 +40,7 @@ class ProfileVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        if items[indexPath.row] == "Update Profile" {
+        if items[indexPath.row] == "Chnage Name or Email" {
             toggle = true
         } else if items[indexPath.row] == "Change Password" {
             toggle = false
