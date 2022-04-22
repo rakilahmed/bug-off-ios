@@ -32,6 +32,7 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
         newEmailField.delegate = self
         newPasswordField.delegate = self
         confirmPasswordField.delegate = self
+        resetFields()
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
     }
@@ -89,6 +90,14 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         self.present(alert, animated: true)
+        resetFields()
+    }
+    
+    func resetFields() {
+        newNameField.text = ""
+        newEmailField.text = ""
+        newPasswordField.text = ""
+        confirmPasswordField.text = ""
     }
     
     @IBAction func saveTapped(_ sender: UIBarButtonItem) {
@@ -127,6 +136,8 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
                         }
                     }
                 }
+            } else {
+                showAlert(title: "Failed to Change Password ", message: "Passwords must match.")
             }
         }
         

@@ -51,6 +51,7 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
         nameField.delegate = self
         emailField.delegate = self
         passwordField.delegate = self
+        resetFields()
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -149,12 +150,19 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         self.present(alert, animated: true)
+        resetFields()
+    }
+    
+    func resetFields() {
+        nameField.text = ""
+        emailField.text = ""
+        passwordField.text = ""
     }
     
     @IBAction func loginTapped(_ sender: UIButton) {
         var errorMessage = validateFields(check: "login")
         if errorMessage != nil {
-            showAlert(title: "Uh Oh!", message: errorMessage!)
+            showAlert(title: "Failed to Login", message: errorMessage!)
         } else {
             let email = emailField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             let password = passwordField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -168,12 +176,13 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
                 }
             }
         }
+        resetFields()
     }
     
     @IBAction func registerTapped(_ sender: UIButton) {
         var errorMessage = validateFields(check: "register")
         if errorMessage != nil {
-            showAlert(title: "Uh Oh!", message: errorMessage!)
+            showAlert(title: "Failed to Register", message: errorMessage!)
         } else {
             let name = nameField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             let email = emailField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -197,5 +206,4 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
         loginState = !loginState
         tableView.reloadData()
     }
-    
 }

@@ -24,12 +24,13 @@ struct Ticket: Codable {
 // MARK: - TicketElement
 struct TicketElement: Codable {
     let id: Int
-    let submittedBy, assignedTo, title: String
-    let summary, priority, dueDate, createdAt: String
-    let updatedAt: String
+    let status, submittedBy, assignedTo: String
+    let title, summary, priority: String
+    let dueDate, createdAt, updatedAt: String
 
     enum CodingKeys: String, CodingKey {
         case id = "_id"
+        case status
         case submittedBy = "submitted_by"
         case assignedTo = "assigned_to"
         case title, summary, priority

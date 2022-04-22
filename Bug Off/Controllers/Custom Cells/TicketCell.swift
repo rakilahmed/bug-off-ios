@@ -15,21 +15,21 @@ class TicketCell: UITableViewCell {
     }
     
     @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var dueDateLabel: UILabel!
+    @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var priorityLabel: UILabel!
     
-    public func configure(with title: String, dueDate: String, priority: String) {
-//        let dueDateOriginal = DateFormatter()
-//        dueDateOriginal.dateFormat = "yyyy-MM-ddTHH:mm:ssZ"
-//        let dueDateFormat = DateFormatter()
-//        dueDateFormat.dateFormat = "MMM dd,yyyy"
-//        print(dueDateOriginal.date(from: dueDate))
-//        let date: Date? = dueDateOriginal.string(from: dueDate)
-//        print(dueDateOriginal.date(from: dueDate))
-//        print(dueDateFormat.string(from: date!))
+    public func configure(with title: String, status: String, date: String, priority: String) {
+        var finalDate = ""
+        if date != "" {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            let formattedDate = dateFormatter.date(from: date)!
+            dateFormatter.dateFormat = "MMM d, h:mm a"
+            finalDate = dateFormatter.string(from: formattedDate)
+        }
         
         titleLabel.text = title
-        dueDateLabel.text = dueDate
+        dateLabel.text = date != "" ? (status == "open" ? "Due: " + finalDate : "Last updated: " + finalDate) : ""
         priorityLabel.text = priority
         
         Utilities.stylePriorityTextLabel(priorityLabel)
@@ -37,13 +37,9 @@ class TicketCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
     
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+    }
 }

@@ -9,7 +9,12 @@ import UIKit
 import FirebaseAuth
 
 class TicketsVC: UITableViewController {
-    var tickets = [TicketElement]()
+    var openTickets = [TicketElement]()
+    var closedTickets = [TicketElement]()
+    lazy var ticketsToDisplay = openTickets
+    
+    @IBOutlet weak var openClosedControl: UISegmentedControl!
+    @IBOutlet weak var addButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,25 +37,29 @@ class TicketsVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tickets.count == 0 ? 1 : tickets.count
+        return ticketsToDisplay.count == 0 ? 1 : ticketsToDisplay.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let segmentOption = openClosedControl.selectedSegmentIndex == 0 ? "open" : "closed"
         let cell = tableView.dequeueReusableCell(withIdentifier: TicketCell.identifier, for: indexPath) as! TicketCell
-        if tickets.count > 0 {
-            cell.configure(with: tickets[indexPath.row].title, dueDate: tickets[indexPath.row].dueDate, priority: tickets[indexPath.row].priority)
-            cell.accessoryType = .disclosureIndicator
+        if ticketsToDisplay.count > 0 {
+            if segmentOption == "open" {
+                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].dueDate, priority: ticketsToDisplay[indexPath.row].priority)
+                cell.accessoryType = .disclosureIndicator
+            } else {
+                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].updatedAt, priority: ticketsToDisplay[indexPath.row].priority)
+                cell.accessoryType = .disclosureIndicator
+            }
         } else {
-            cell.titleLabel.text = "No tickets to show..."
-            cell.dueDateLabel.text = ""
-            cell.priorityLabel.text = ""
+            cell.configure(with: "No \(segmentOption) tickets to show...", status: "", date: "", priority: "")
             cell.accessoryType = .none
         }
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(tickets[indexPath.row].title)
+        print(ticketsToDisplay[indexPath.row].title)
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -58,7 +67,8 @@ class TicketsVC: UITableViewController {
     }
     
     func fetchTickets() {
-        tickets.removeAll()
+        openTickets.removeAll()
+        closedTickets.removeAll()
         
         let request = URLRequest(url: URL(string: "https://bugoff.rakilahmed.com/api/tickets")!)
         let sessionConfiguration = URLSessionConfiguration.default
@@ -79,11 +89,24 @@ class TicketsVC: UITableViewController {
                         let userObject = try decoder.decode([Ticket].self, from: data)
                         
                         if userObject.count > 0 {
-                            self.tickets = userObject[0].tickets.reversed()
+                            self.openTickets = userObject[0].tickets.filter { ticket in
+                                return ticket.status == "open"
+                            }
+                            
+                            self.closedTickets = userObject[0].tickets.filter { ticket in
+                                return ticket.status == "closed"
+                            }
                         }
                         
                         DispatchQueue.main.async {
                             self.tableView.refreshControl?.endRefreshing()
+                            
+                            if self.openClosedControl.selectedSegmentIndex == 0 {
+                                self.ticketsToDisplay = self.openTickets
+                            } else {
+                                self.ticketsToDisplay = self.closedTickets
+                            }
+                            
                             self.tableView.reloadData()
                         }
                     } catch {
@@ -92,5 +115,18 @@ class TicketsVC: UITableViewController {
                 }
             }.resume()
         }
+    }
+    
+    @IBAction func openClosedTapped(_ sender: UISegmentedControl) {
+        switch openClosedControl.selectedSegmentIndex {
+        case 0:
+            ticketsToDisplay = openTickets
+        case 1:
+            ticketsToDisplay = closedTickets
+        default:
+            ticketsToDisplay = openTickets
+        }
+        
+        tableView.reloadData()
     }
 }

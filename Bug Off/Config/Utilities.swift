@@ -43,8 +43,10 @@ class Utilities {
             label.layer.backgroundColor = UIColor.init(red: 91/255, green: 194/255, blue: 143/255, alpha: 1).cgColor
         } else if label.text == "Medium" {
             label.layer.backgroundColor = UIColor.init(red: 243/255, green: 191/255, blue: 51/255, alpha: 1).cgColor
-        } else {
+        } else if label.text == "High" {
             label.layer.backgroundColor = UIColor.init(red: 215/255, green: 59/255, blue: 48/255, alpha: 1).cgColor
+        } else {
+            label.layer.backgroundColor = .none
         }
     }
     
