@@ -15,7 +15,7 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
     @IBOutlet weak var newEmailField: UITextField!
     @IBOutlet weak var newPasswordField: UITextField!
     @IBOutlet weak var confirmPasswordField: UITextField!
-    @IBOutlet weak var saveButton: UIBarButtonItem!
+    @IBOutlet weak var doneButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,7 +24,6 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
     
     func setupElements() {
         title = toggle ? "Chnage Name or Email" : "Change Password"
-        saveButton.isEnabled = false
         currentName.text = Auth.auth().currentUser?.displayName
         currentEmail.text = Auth.auth().currentUser?.email
         
@@ -32,7 +31,6 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
         newEmailField.delegate = self
         newPasswordField.delegate = self
         confirmPasswordField.delegate = self
-        resetFields()
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
     }
@@ -77,8 +75,26 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
         return true
     }
     
-    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-        saveButton.isEnabled = !textField.text!.isEmpty ? true : false
+    func textField(
+        _ textField: UITextField,
+        shouldChangeCharactersIn range: NSRange,
+        replacementString string: String
+    ) -> Bool {
+        let oldText = textField.text!
+        let stringRange = Range(range, in: oldText)!
+        let newText = oldText.replacingCharacters(
+            in: stringRange,
+            with: string)
+        if newText.isEmpty {
+            doneButton.isEnabled = false
+        } else {
+            doneButton.isEnabled = true
+        }
+        return true
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        doneButton.isEnabled = false
         return true
     }
     
@@ -100,7 +116,7 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
         confirmPasswordField.text = ""
     }
     
-    @IBAction func saveTapped(_ sender: UIBarButtonItem) {
+    @IBAction func doneTapped(_ sender: UIBarButtonItem) {
         if toggle {
             let newName = newNameField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             let newEmail = newEmailField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -141,6 +157,6 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
             }
         }
         
-        self.navigationController?.popViewController(animated: true)
+        navigationController?.popViewController(animated: true)
     }
 }

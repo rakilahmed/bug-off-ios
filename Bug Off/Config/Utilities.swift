@@ -29,6 +29,12 @@ class Utilities {
         textfield.layer.borderColor = UIColor.init(red: 48/255, green: 48/255, blue: 56/255, alpha: 0.5).cgColor
     }
     
+    static func styleTextView(_ textview:UITextView) {
+        textview.layer.borderWidth = 0.5
+        textview.layer.cornerRadius = 5
+        textview.layer.borderColor = UIColor.init(red: 48/255, green: 48/255, blue: 56/255, alpha: 0.5).cgColor
+    }
+    
     static func styleTextLabel(_ label: UILabel) {
         label.layer.borderWidth = 1.0
         label.layer.cornerRadius = 5

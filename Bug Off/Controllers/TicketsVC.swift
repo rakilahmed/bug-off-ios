@@ -8,13 +8,14 @@
 import UIKit
 import FirebaseAuth
 
+var openTickets = [TicketElement]()
+var closedTickets = [TicketElement]()
+
 class TicketsVC: UITableViewController {
-    var openTickets = [TicketElement]()
-    var closedTickets = [TicketElement]()
-    lazy var ticketsToDisplay = openTickets
-    
     @IBOutlet weak var openClosedControl: UISegmentedControl!
     @IBOutlet weak var addButton: UIBarButtonItem!
+    
+    lazy var ticketsToDisplay = openTickets
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,7 +60,7 @@ class TicketsVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(ticketsToDisplay[indexPath.row].title)
+        performSegue(withIdentifier: "viewTicket", sender: indexPath)
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -89,25 +90,18 @@ class TicketsVC: UITableViewController {
                         let userObject = try decoder.decode([Ticket].self, from: data)
                         
                         if userObject.count > 0 {
-                            self.openTickets = userObject[0].tickets.filter { ticket in
+                            openTickets = userObject[0].tickets.filter { ticket in
                                 return ticket.status == "open"
                             }
                             
-                            self.closedTickets = userObject[0].tickets.filter { ticket in
+                            closedTickets = userObject[0].tickets.filter { ticket in
                                 return ticket.status == "closed"
                             }
                         }
                         
                         DispatchQueue.main.async {
                             self.tableView.refreshControl?.endRefreshing()
-                            
-                            if self.openClosedControl.selectedSegmentIndex == 0 {
-                                self.ticketsToDisplay = self.openTickets
-                            } else {
-                                self.ticketsToDisplay = self.closedTickets
-                            }
-                            
-                            self.tableView.reloadData()
+                            self.updateTickets()
                         }
                     } catch {
                         print(error)
@@ -117,16 +111,36 @@ class TicketsVC: UITableViewController {
         }
     }
     
-    @IBAction func openClosedTapped(_ sender: UISegmentedControl) {
-        switch openClosedControl.selectedSegmentIndex {
-        case 0:
-            ticketsToDisplay = openTickets
-        case 1:
-            ticketsToDisplay = closedTickets
-        default:
-            ticketsToDisplay = openTickets
+    func updateTickets() {
+        ticketsToDisplay.removeAll()
+        
+        if self.openClosedControl.selectedSegmentIndex == 0 {
+            ticketsToDisplay = openTickets.reversed()
+        } else {
+            ticketsToDisplay = closedTickets.reversed()
         }
         
+        self.tableView.reloadData()
+    }
+    
+    @IBAction func openClosedTapped(_ sender: UISegmentedControl) {
+        switch openClosedControl.selectedSegmentIndex {
+        case 1:
+            ticketsToDisplay = closedTickets.reversed()
+        default:
+            ticketsToDisplay = openTickets.reversed()        }
+        
         tableView.reloadData()
+    }
+    
+    @IBAction func addTapped(_ sender: UIBarButtonItem) {
+        let vc = storyboard?.instantiateViewController(withIdentifier: "addEditTicketVC") as! AddEditTicketVC
+        vc.title = "Add Ticket"
+        vc.updateTable = {
+            DispatchQueue.main.async {
+                self.updateTickets()
+            }
+        }
+        navigationController?.pushViewController(vc, animated: true)
     }
 }

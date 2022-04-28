@@ -14,6 +14,7 @@
 		8D45A36128041CED00B5356C /* LoginRegisterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D45A36028041CED00B5356C /* LoginRegisterVC.swift */; };
 		8D505AED27F5138100A18BAA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8D505AEC27F5138100A18BAA /* GoogleService-Info.plist */; };
 		8D505AF027F514C600A18BAA /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8D505AEF27F514C600A18BAA /* FirebaseAuth */; };
+		8DA2C5A4281A36DC00A4E912 /* ViewTicketVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA2C5A3281A36DC00A4E912 /* ViewTicketVC.swift */; };
 		8DB60E382807407200BE247D /* TicketCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB60E362807407200BE247D /* TicketCell.swift */; };
 		8DB60E392807407200BE247D /* TicketCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8DB60E372807407200BE247D /* TicketCell.xib */; };
 		8DC256A627F5069400CE6879 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DC256A527F5069400CE6879 /* Utilities.swift */; };
@@ -21,6 +22,7 @@
 		8DCD7D6227F4F1950012803F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8DCD7D6027F4F1950012803F /* Main.storyboard */; };
 		8DCD7D6427F4F1970012803F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8DCD7D6327F4F1970012803F /* Assets.xcassets */; };
 		8DCD7D6727F4F1970012803F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8DCD7D6527F4F1970012803F /* LaunchScreen.storyboard */; };
+		8DD5F0FB28191CDC009F97EC /* AddEditTicketVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD5F0FA28191CDC009F97EC /* AddEditTicketVC.swift */; };
 		8DF5C6B328072A20006A08A6 /* TicketsData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF5C6B228072A20006A08A6 /* TicketsData.swift */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +33,7 @@
 		8D268CFC2806B42B008B38DA /* UpdateProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateProfileVC.swift; sourceTree = "<group>"; };
 		8D45A36028041CED00B5356C /* LoginRegisterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRegisterVC.swift; sourceTree = "<group>"; };
 		8D505AEC27F5138100A18BAA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		8DA2C5A3281A36DC00A4E912 /* ViewTicketVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewTicketVC.swift; sourceTree = "<group>"; };
 		8DB60E362807407200BE247D /* TicketCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketCell.swift; sourceTree = "<group>"; };
 		8DB60E372807407200BE247D /* TicketCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TicketCell.xib; sourceTree = "<group>"; };
 		8DC256A527F5069400CE6879 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
@@ -40,6 +43,7 @@
 		8DCD7D6327F4F1970012803F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8DCD7D6627F4F1970012803F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8DCD7D6827F4F1970012803F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8DD5F0FA28191CDC009F97EC /* AddEditTicketVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditTicketVC.swift; sourceTree = "<group>"; };
 		8DF5C6B228072A20006A08A6 /* TicketsData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketsData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -72,6 +76,8 @@
 				8D1E648527FD7A3D00936FFF /* TicketsVC.swift */,
 				8D1E648327FD7A2600936FFF /* ProfileVC.swift */,
 				8D268CFC2806B42B008B38DA /* UpdateProfileVC.swift */,
+				8DD5F0FA28191CDC009F97EC /* AddEditTicketVC.swift */,
+				8DA2C5A3281A36DC00A4E912 /* ViewTicketVC.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -206,7 +212,9 @@
 			files = (
 				8DB60E382807407200BE247D /* TicketCell.swift in Sources */,
 				8D1E648427FD7A2600936FFF /* ProfileVC.swift in Sources */,
+				8DA2C5A4281A36DC00A4E912 /* ViewTicketVC.swift in Sources */,
 				8DF5C6B328072A20006A08A6 /* TicketsData.swift in Sources */,
+				8DD5F0FB28191CDC009F97EC /* AddEditTicketVC.swift in Sources */,
 				8D1E648627FD7A3D00936FFF /* TicketsVC.swift in Sources */,
 				8D45A36128041CED00B5356C /* LoginRegisterVC.swift in Sources */,
 				8DC256A627F5069400CE6879 /* Utilities.swift in Sources */,
