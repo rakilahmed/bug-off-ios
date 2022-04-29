@@ -15,11 +15,12 @@ protocol AddEditTicketVCDelegate: AnyObject {
 class AddEditTicketVC: UITableViewController {
     @IBOutlet weak var titleField: UITextField!
     @IBOutlet weak var summaryField: UITextView!
-    @IBOutlet weak var priorityField: UITextField!
+    @IBOutlet weak var priorityControl: UISegmentedControl!
     @IBOutlet weak var doneButton: UIBarButtonItem!
     @IBOutlet weak var dueDatePicker: UIDatePicker!
     
     weak var delegate: AddEditTicketVCDelegate?
+    var priority: String?
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,9 +43,9 @@ class AddEditTicketVC: UITableViewController {
                 "Authorization": "Bearer \(idToken!)"
             ]
             
-            let userObj = Ticket(id: Auth.auth().currentUser!.uid, email: Auth.auth().currentUser!.email!, tickets: [ticket], createdAt: ticket.createdAt, updatedAt: ticket.updatedAt)
+            let userObject = Ticket(id: Auth.auth().currentUser!.uid, email: Auth.auth().currentUser!.email!, tickets: [ticket], createdAt: ticket.createdAt, updatedAt: ticket.updatedAt)
             
-            request.httpBody = try? JSONEncoder().encode(userObj)
+            request.httpBody = try? JSONEncoder().encode(userObject)
             
             URLSession(configuration: sessionConfiguration).dataTask(with: request) { (data, _, error) in
                 if let data = data {
@@ -64,7 +65,6 @@ class AddEditTicketVC: UITableViewController {
         
         titleField.delegate = self
         summaryField.delegate = self
-        priorityField.delegate = self
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
     }
@@ -72,7 +72,7 @@ class AddEditTicketVC: UITableViewController {
     func resetFields() {
         titleField.text = ""
         summaryField.text = ""
-        priorityField.text = ""
+        priorityControl.selectedSegmentIndex = 0
     }
     
     func showAlert(title: String, message: String) {
@@ -91,13 +91,24 @@ class AddEditTicketVC: UITableViewController {
     }
     
     // MARK: - Actions
+    @IBAction func priorityTapped(_ sender: UISegmentedControl) {
+        switch priorityControl.selectedSegmentIndex {
+        case 1:
+            priority = "Medium"
+        case 2:
+            priority = "High"
+        default:
+            priority = "Low"
+        }
+    }
+    
     @IBAction func doneTapped(_ sender: UIBarButtonItem) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
         let createUpdateDate = dateFormatter.string(from: Date())
         let dueDate = dateFormatter.string(from: dueDatePicker.date)
-        
-        let ticket = TicketElement(id: random(digits: 4), status: "open", submittedBy: Auth.auth().currentUser?.displayName ?? "Self", assignedTo: "Self", title: titleField.text!, summary: summaryField.text!, priority: priorityField.text!, dueDate: dueDate, createdAt: createUpdateDate, updatedAt: createUpdateDate)
+                
+        let ticket = TicketElement(id: random(digits: 4), status: "open", submittedBy: Auth.auth().currentUser?.displayName ?? "Self", assignedTo: "Self", title: titleField.text!, summary: summaryField.text!, priority: priority ?? "Low", dueDate: dueDate, createdAt: createUpdateDate, updatedAt: createUpdateDate)
         
         addTicket(ticket: ticket)
         openTickets.append(ticket)
@@ -122,7 +133,7 @@ extension AddEditTicketVC: UITextFieldDelegate, UITextViewDelegate {
         case titleField:
             summaryField.becomeFirstResponder()
         default:
-            priorityField.resignFirstResponder()
+            summaryField.resignFirstResponder()
         }
         
         return true

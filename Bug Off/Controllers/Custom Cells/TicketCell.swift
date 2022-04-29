@@ -29,7 +29,7 @@ class TicketCell: UITableViewCell {
         }
         
         titleLabel.text = title
-        dateLabel.text = date != "" ? (status == "open" ? "Due: " + finalDate : "Last updated: " + finalDate) : ""
+        dateLabel.text = date != "" ? (status == "open" ? "Due: " + finalDate : "Closed At: " + finalDate) : ""
         priorityLabel.text = priority
         
         Utilities.stylePriorityTextLabel(priorityLabel)
