@@ -19,9 +19,14 @@ class AddEditTicketVC: UITableViewController {
     @IBOutlet weak var doneButton: UIBarButtonItem!
     @IBOutlet weak var dueDatePicker: UIDatePicker!
     
+    let URI = "https://bugoff.rakilahmed.com/api/tickets"
+    
     weak var delegate: AddEditTicketVCDelegate?
     var priority: String?
-        
+    var ticket: TicketElement?
+    var update: (() -> Void)?
+    var ticketRowIdx: Int?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupElements()
@@ -29,7 +34,7 @@ class AddEditTicketVC: UITableViewController {
     
     // MARK: - Add Ticket (API)
     func addTicket(ticket: TicketElement) {
-        var request = URLRequest(url: URL(string: "https://bugoff.rakilahmed.com/api/tickets")!)
+        var request = URLRequest(url: URL(string: URI)!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         let sessionConfiguration = URLSessionConfiguration.default
@@ -59,14 +64,72 @@ class AddEditTicketVC: UITableViewController {
         }
     }
     
+    // MARK: - Edit Ticket (API)
+    func editTicket(ticket: TicketElement) {
+        var request = URLRequest(url: URL(string: URI + "/\(ticket.id)")!)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let sessionConfiguration = URLSessionConfiguration.default
+        
+        Auth.auth().currentUser?.getIDToken() {idToken, error in
+            if let error = error {
+                print("Error: \(error)")
+            }
+            
+            sessionConfiguration.httpAdditionalHeaders = [
+                "Authorization": "Bearer \(idToken!)"
+            ]
+            
+            let userObject = Ticket(id: Auth.auth().currentUser!.uid, email: Auth.auth().currentUser!.email!, tickets: [ticket], createdAt: ticket.createdAt, updatedAt: ticket.updatedAt)
+            
+            request.httpBody = try? JSONEncoder().encode(userObject)
+            
+            URLSession(configuration: sessionConfiguration).dataTask(with: request) { (data, _, error) in
+                if data == nil {
+                    print("Error Editing Ticket with ID \(ticket.id)")
+                }
+            }.resume()
+        }
+    }
+    
     // MARK: - Helper Functions
     func setupElements() {
         Utilities.styleTextView(summaryField)
+        
+        if ticket != nil {
+            titleField.text = ticket?.title
+            summaryField.text = ticket?.summary
+            
+            if ticket?.priority == "Low" {
+                priorityControl.selectedSegmentIndex = 0
+                priority = "Low"
+            } else if ticket?.priority == "Medium" {
+                priorityControl.selectedSegmentIndex = 1
+                priority = "Medium"
+            } else {
+                priorityControl.selectedSegmentIndex = 2
+                priority = "High"
+            }
+            
+            if ticket?.dueDate != "" {
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                let formattedDate = dateFormatter.date(from: ticket!.dueDate)!
+                dueDatePicker.date = formattedDate
+            }
+        }
         
         titleField.delegate = self
         summaryField.delegate = self
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
+    }
+    
+    func validateFields() -> String? {
+        if titleField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" || summaryField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
+            return "Please fill in all the fields."
+        }
+        return nil
     }
     
     func resetFields() {
@@ -79,7 +142,6 @@ class AddEditTicketVC: UITableViewController {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         self.present(alert, animated: true)
-        resetFields()
     }
     
     func random(digits:Int) -> Int {
@@ -103,17 +165,43 @@ class AddEditTicketVC: UITableViewController {
     }
     
     @IBAction func doneTapped(_ sender: UIBarButtonItem) {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        let createUpdateDate = dateFormatter.string(from: Date())
-        let dueDate = dateFormatter.string(from: dueDatePicker.date)
+        let errorMessage = validateFields()
+        
+        if errorMessage != nil {
+            showAlert(title: "Failed to \(title!)", message: errorMessage!)
+        } else {
+            var id = random(digits: 4)
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            var createdAt = dateFormatter.string(from: Date())
+            var updatedAt = createdAt
+            let dueDate = dateFormatter.string(from: dueDatePicker.date)
+            
+            if ticket != nil {
+                id = ticket!.id
+                createdAt = ticket!.createdAt
+                updatedAt = dateFormatter.string(from: Date())
+            }
+            
+            let title = titleField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
+            let summary = summaryField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            let ticket = TicketElement(id: id, status: "open", submittedBy: Auth.auth().currentUser?.displayName ?? "Self", assignedTo: "Self", title: title, summary: summary, priority: priority ?? "Low", dueDate: dueDate, createdAt: createdAt, updatedAt: updatedAt)
+            
+            if self.ticket != nil {
+                openTickets.remove(at: ticketRowIdx!)
+                editTicket(ticket: ticket)
+                openTickets.insert(ticket, at: ticketRowIdx!)
                 
-        let ticket = TicketElement(id: random(digits: 4), status: "open", submittedBy: Auth.auth().currentUser?.displayName ?? "Self", assignedTo: "Self", title: titleField.text!, summary: summaryField.text!, priority: priority ?? "Low", dueDate: dueDate, createdAt: createUpdateDate, updatedAt: createUpdateDate)
-        
-        addTicket(ticket: ticket)
-        openTickets.append(ticket)
-        
-        delegate?.addEditTicketVC(self, didFinishAdding: ticket)
+                update!()
+                navigationController?.popToRootViewController(animated: true)
+            } else {
+                addTicket(ticket: ticket)
+                openTickets.append(ticket)
+                
+                delegate?.addEditTicketVC(self, didFinishAdding: ticket)
+            }
+        }
     }
     
     // MARK: - Table View Data Source

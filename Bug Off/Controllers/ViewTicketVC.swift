@@ -27,10 +27,25 @@ class ViewTicketVC: UITableViewController {
     var ticket: TicketElement?
     var ticketRowIdx: Int?
     var segmentIdx: Int?
-
+    var update: (() -> Void)?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupElements()
+    }
+    
+    // MARK: - Navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "editTicket" {
+            let controller = segue.destination as! AddEditTicketVC
+            controller.title = "Edit Ticket"
+            controller.update = {
+                self.update!()
+            }
+            controller.ticketRowIdx = ticketRowIdx
+            controller.doneButton.isEnabled = true
+            controller.ticket = ticket
+        }
     }
     
     // MARK: - Delete Ticket (API)
@@ -47,7 +62,7 @@ class ViewTicketVC: UITableViewController {
             sessionConfiguration.httpAdditionalHeaders = [
                 "Authorization": "Bearer \(idToken!)"
             ]
-                        
+            
             URLSession(configuration: sessionConfiguration).dataTask(with: request) { (data, _, error) in
                 if data == nil {
                     print("Error Deleting Ticket with ID \(ticketID)")
@@ -75,7 +90,7 @@ class ViewTicketVC: UITableViewController {
             let userObject = Ticket(id: Auth.auth().currentUser!.uid, email: Auth.auth().currentUser!.email!, tickets: [ticket], createdAt: ticket.createdAt, updatedAt: ticket.updatedAt)
             
             request.httpBody = try? JSONEncoder().encode(userObject)
-                        
+            
             URLSession(configuration: sessionConfiguration).dataTask(with: request) { (data, _, error) in
                 if data == nil {
                     print("Error Updating Ticket with ID \(ticket.id)")
@@ -167,7 +182,7 @@ class ViewTicketVC: UITableViewController {
     
     // MARK: - Table View Delegate
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
+        return section == 0 ? 1.0 : 32
     }
     
     override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {

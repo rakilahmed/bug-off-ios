@@ -15,6 +15,7 @@ class TicketsVC: UITableViewController, AddEditTicketVCDelegate, ViewTicketVCDel
     @IBOutlet weak var openClosedControl: UISegmentedControl!
     
     lazy var ticketsToDisplay = openTickets
+    var currentTicketIdx: Int?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -123,8 +124,10 @@ class TicketsVC: UITableViewController, AddEditTicketVCDelegate, ViewTicketVCDel
         if ticketsToDisplay.count > 0 {
             if segmentOption == "open" {
                 cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].dueDate, priority: ticketsToDisplay[indexPath.row].priority)
+                cell.accessoryType = .disclosureIndicator
             } else {
                 cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].updatedAt, priority: ticketsToDisplay[indexPath.row].priority)
+                cell.accessoryType = .disclosureIndicator
             }
         } else {
             cell.configure(with: "No \(segmentOption) tickets to show...", status: "", date: "", priority: "")
@@ -137,11 +140,15 @@ class TicketsVC: UITableViewController, AddEditTicketVCDelegate, ViewTicketVCDel
     // MARK: - Table View Delegate
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if ticketsToDisplay.count > 0 {
+            currentTicketIdx = indexPath.row
             let vc = storyboard?.instantiateViewController(withIdentifier: "viewTicketVC") as! ViewTicketVC
             vc.delegate = self
-            vc.ticket = ticketsToDisplay[indexPath.row]
-            vc.ticketRowIdx = indexPath.row
+            vc.ticket = ticketsToDisplay[currentTicketIdx!]
+            vc.ticketRowIdx = currentTicketIdx
             vc.segmentIdx = openClosedControl.selectedSegmentIndex
+            vc.update = {
+                self.updateTickets()
+            }
             navigationController?.pushViewController(vc, animated: true)
         }
     }
