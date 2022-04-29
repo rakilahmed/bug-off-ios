@@ -11,7 +11,7 @@ import FirebaseAuth
 var openTickets = [TicketElement]()
 var closedTickets = [TicketElement]()
 
-class TicketsVC: UITableViewController {
+class TicketsVC: UITableViewController, AddEditTicketVCDelegate {
     @IBOutlet weak var openClosedControl: UISegmentedControl!
     @IBOutlet weak var addButton: UIBarButtonItem!
     
@@ -20,54 +20,19 @@ class TicketsVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupElements()
-    }
-    
-    func setupElements() {
-        title = "Tickets"
-        tableView.register(TicketCell.nib(), forCellReuseIdentifier: TicketCell.identifier)
-        
-        fetchTickets()
-        
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
-        tableView.refreshControl = refreshControl
-    }
-    
-    @objc func pullToRefresh() {
         fetchTickets()
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return ticketsToDisplay.count == 0 ? 1 : ticketsToDisplay.count
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let segmentOption = openClosedControl.selectedSegmentIndex == 0 ? "open" : "closed"
-        let cell = tableView.dequeueReusableCell(withIdentifier: TicketCell.identifier, for: indexPath) as! TicketCell
-        if ticketsToDisplay.count > 0 {
-            if segmentOption == "open" {
-                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].dueDate, priority: ticketsToDisplay[indexPath.row].priority)
-                cell.accessoryType = .disclosureIndicator
-            } else {
-                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].updatedAt, priority: ticketsToDisplay[indexPath.row].priority)
-                cell.accessoryType = .disclosureIndicator
-            }
-        } else {
-            cell.configure(with: "No \(segmentOption) tickets to show...", status: "", date: "", priority: "")
-            cell.accessoryType = .none
+    // MARK: - Navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "addEditTicket" {
+            let controller = segue.destination as! AddEditTicketVC
+            controller.delegate = self
         }
-        return cell
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: "viewTicket", sender: indexPath)
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60
-    }
-    
-    func fetchTickets() {
+    // MARK: - Fetching Tickets (API)
+    @objc func fetchTickets() {
         openTickets.removeAll()
         closedTickets.removeAll()
         
@@ -111,6 +76,16 @@ class TicketsVC: UITableViewController {
         }
     }
     
+    // MARK: - Helper Functions
+    func setupElements() {
+        title = "Tickets"
+        tableView.register(TicketCell.nib(), forCellReuseIdentifier: TicketCell.identifier)
+        
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(fetchTickets), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+    }
+    
     func updateTickets() {
         ticketsToDisplay.removeAll()
         
@@ -123,6 +98,7 @@ class TicketsVC: UITableViewController {
         self.tableView.reloadData()
     }
     
+    // MARK: - Actions
     @IBAction func openClosedTapped(_ sender: UISegmentedControl) {
         switch openClosedControl.selectedSegmentIndex {
         case 1:
@@ -133,14 +109,42 @@ class TicketsVC: UITableViewController {
         tableView.reloadData()
     }
     
-    @IBAction func addTapped(_ sender: UIBarButtonItem) {
-        let vc = storyboard?.instantiateViewController(withIdentifier: "addEditTicketVC") as! AddEditTicketVC
-        vc.title = "Add Ticket"
-        vc.updateTable = {
-            DispatchQueue.main.async {
-                self.updateTickets()
+    
+    // MARK: - Table View Data Source
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return ticketsToDisplay.count == 0 ? 1 : ticketsToDisplay.count
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let segmentOption = openClosedControl.selectedSegmentIndex == 0 ? "open" : "closed"
+        let cell = tableView.dequeueReusableCell(withIdentifier: TicketCell.identifier, for: indexPath) as! TicketCell
+        if ticketsToDisplay.count > 0 {
+            if segmentOption == "open" {
+                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].dueDate, priority: ticketsToDisplay[indexPath.row].priority)
+                cell.accessoryType = .disclosureIndicator
+            } else {
+                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].updatedAt, priority: ticketsToDisplay[indexPath.row].priority)
+                cell.accessoryType = .disclosureIndicator
             }
+        } else {
+            cell.configure(with: "No \(segmentOption) tickets to show...", status: "", date: "", priority: "")
+            cell.accessoryType = .none
         }
-        navigationController?.pushViewController(vc, animated: true)
+        return cell
+    }
+    
+    // MARK: - Table View Delegate
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "viewTicket", sender: indexPath)
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 65
+    }
+    
+    // MARK: - AddEditTicketVC Delegate
+    func addEditTicketVC(_ controller: AddEditTicketVC, didFinishAdding ticket: TicketElement) {
+        updateTickets()
+        navigationController?.popViewController(animated: true)
     }
 }

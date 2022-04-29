@@ -59,12 +59,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		8D1DFB5828116E670061C322 /* API */ = {
+		8D1DFB5828116E670061C322 /* Data Model */ = {
 			isa = PBXGroup;
 			children = (
 				8DF5C6B228072A20006A08A6 /* TicketsData.swift */,
 			);
-			path = API;
+			path = "Data Model";
 			sourceTree = "<group>";
 		};
 		8D400B4027F4F3840000377D /* Controllers */ = {
@@ -91,12 +91,14 @@
 			path = "Custom Cells";
 			sourceTree = "<group>";
 		};
-		8DC256A427F5066300CE6879 /* Config */ = {
+		8DC256A427F5066300CE6879 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8DCD7D6027F4F1950012803F /* Main.storyboard */,
+				8DCD7D6327F4F1970012803F /* Assets.xcassets */,
 				8DC256A527F5069400CE6879 /* Utilities.swift */,
 			);
-			path = Config;
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		8DCD7D4E27F4F1950012803F = {
@@ -118,12 +120,10 @@
 		8DCD7D5927F4F1950012803F /* Bug Off */ = {
 			isa = PBXGroup;
 			children = (
-				8DC256A427F5066300CE6879 /* Config */,
-				8D1DFB5828116E670061C322 /* API */,
+				8D1DFB5828116E670061C322 /* Data Model */,
 				8D400B4027F4F3840000377D /* Controllers */,
+				8DC256A427F5066300CE6879 /* Resources */,
 				8DCD7D5A27F4F1950012803F /* AppDelegate.swift */,
-				8DCD7D6027F4F1950012803F /* Main.storyboard */,
-				8DCD7D6327F4F1970012803F /* Assets.xcassets */,
 				8DCD7D6527F4F1970012803F /* LaunchScreen.storyboard */,
 				8D505AEC27F5138100A18BAA /* GoogleService-Info.plist */,
 				8DCD7D6827F4F1970012803F /* Info.plist */,

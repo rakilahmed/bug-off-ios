@@ -8,7 +8,7 @@
 import UIKit
 import FirebaseAuth
 
-class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
+class LoginRegisterVC: UITableViewController {
     @IBOutlet weak var nameField: UITextField!
     @IBOutlet weak var emailField: UITextField!
     @IBOutlet weak var passwordField: UITextField!
@@ -37,10 +37,12 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         Auth.auth().removeStateDidChangeListener(handle!)
+        
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: self.view.window)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: self.view.window)
     }
     
+    // MARK: - Helper Functions
     func setupElements() {
         Utilities.styleTextField(nameField)
         Utilities.styleTextField(emailField)
@@ -56,68 +58,6 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return section == 0 ? 1.0 : 32
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return section == 0 ? 1.0 : 32
-    }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 8
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let loginHiddenRows = [1, 5, 6]
-        let registerHiddenRows = [4, 7]
-        
-        if indexPath.row == 0 {
-            return tableView.bounds.height * 0.3
-        }
-        
-        if loginState {
-            if loginHiddenRows.contains(indexPath.row) {
-                return 0
-            }
-        } else {
-            if registerHiddenRows.contains(indexPath.row) {
-                return 0
-            }
-        }
-        
-        return super.tableView(tableView, heightForRowAt: indexPath)
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        switch textField {
-        case nameField:
-            emailField.becomeFirstResponder()
-        case emailField:
-            passwordField.becomeFirstResponder()
-        default:
-            passwordField.resignFirstResponder()
-        }
-        
-        return true
-    }
-    
-    @objc func hideKeyboard() {
-        self.view.endEditing(true)
-    }
-    
-    @objc func keyboardWillShow(notification: NSNotification) {
-        if let keyboardHeight = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            if self.view.frame.origin.y == 0 {
-                self.view.frame.origin.y -= keyboardHeight.height / 4
-            }
-        }
-    }
-    
-    @objc func keyboardWillHide(notification: NSNotification) {
-        self.view.frame.origin.y = 0
     }
     
     func validateFields(check: String) -> String? {
@@ -146,6 +86,12 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
         return nil
     }
     
+    func resetFields() {
+        nameField.text = ""
+        emailField.text = ""
+        passwordField.text = ""
+    }
+    
     func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -153,10 +99,10 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
         resetFields()
     }
     
-    func resetFields() {
-        nameField.text = ""
-        emailField.text = ""
-        passwordField.text = ""
+    // MARK: - Actions
+    @IBAction func toggleState(_ sender: UIButton) {
+        loginState = !loginState
+        tableView.reloadData()
     }
     
     @IBAction func loginTapped(_ sender: UIButton) {
@@ -176,7 +122,6 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
                 }
             }
         }
-        resetFields()
     }
     
     @IBAction func registerTapped(_ sender: UIButton) {
@@ -202,8 +147,69 @@ class LoginRegisterVC: UITableViewController, UITextFieldDelegate {
         }
     }
     
-    @IBAction func toggleState(_ sender: UIButton) {
-        loginState = !loginState
-        tableView.reloadData()
+    // MARK: - Table View Data Source
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 8
+    }
+    
+    // MARK: - Table View Delegate
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let loginHiddenRows = [1, 5, 6]
+        let registerHiddenRows = [4, 7]
+        
+        if indexPath.row == 0 {
+            return tableView.bounds.height * 0.3
+        }
+        
+        if loginState {
+            if loginHiddenRows.contains(indexPath.row) {
+                return 0
+            }
+        } else {
+            if registerHiddenRows.contains(indexPath.row) {
+                return 0
+            }
+        }
+        
+        return super.tableView(tableView, heightForRowAt: indexPath)
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return section == 0 ? 1.0 : 32
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return section == 0 ? 1.0 : 32
+    }
+}
+
+extension LoginRegisterVC: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        switch textField {
+        case nameField:
+            emailField.becomeFirstResponder()
+        case emailField:
+            passwordField.becomeFirstResponder()
+        default:
+            passwordField.resignFirstResponder()
+        }
+        
+        return true
+    }
+    
+    @objc func hideKeyboard() {
+        self.view.endEditing(true)
+    }
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+        if let keyboardHeight = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            if self.view.frame.origin.y == 0 {
+                self.view.frame.origin.y -= keyboardHeight.height / 4
+            }
+        }
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        self.view.frame.origin.y = 0
     }
 }

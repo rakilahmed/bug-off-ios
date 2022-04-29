@@ -22,15 +22,31 @@ class ProfileVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         setupElements()
     }
     
+    // MARK: - Helper Functions
     func setupElements() {
         title = "Profile"
         Utilities.styleHollowButton(logoutButton)
     }
     
+    // MARK: - Actions
+    @IBAction func logoutTapped(_ sender: Any) {
+        do {
+            try Auth.auth().signOut()
+            UserDefaults.standard.set(false, forKey: "authStatus")
+            UserDefaults.standard.set(0, forKey: "selectedTab")
+            Utilities.updateRootVC()
+            print("-> Logged out successfully <-")
+        } catch {
+            print("-> Failed to logout <-")
+        }
+    }
+    
+    // MARK: - Table View Data Source
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
     }
     
+    // MARK: - Table View Delegate
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.textLabel?.text = items[indexPath.row]
@@ -46,17 +62,4 @@ class ProfileVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
             toggle = false
         }
     }
-    
-    @IBAction func logoutTapped(_ sender: Any) {
-        do {
-            try Auth.auth().signOut()
-            UserDefaults.standard.set(false, forKey: "authStatus")
-            UserDefaults.standard.set(0, forKey: "selectedTab")
-            Utilities.updateRootVC()
-            print("-> Logged out successfully <-")
-        } catch {
-            print("-> Failed to logout <-")
-        }
-    }
-    
 }

@@ -356,7 +356,7 @@
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="bgF-Ah-Z8w">
                             <connections>
-                                <action selector="addTapped:" destination="Km1-5C-W4V" id="t0B-qH-4ud"/>
+                                <segue destination="dsi-QB-YRV" kind="show" identifier="addEditTicket" id="QrK-lO-RJn"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -407,7 +407,7 @@
         <!--Add Edit TicketVC-->
         <scene sceneID="WTJ-TA-SQF">
             <objects>
-                <tableViewController storyboardIdentifier="addEditTicketVC" id="dsi-QB-YRV" customClass="AddEditTicketVC" customModule="Bug_Off" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="dsi-QB-YRV" customClass="AddEditTicketVC" customModule="Bug_Off" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="yP1-IC-ofm">
                         <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -832,6 +832,9 @@
             <point key="canvasLocation" x="4166" y="-547"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="QrK-lO-RJn"/>
+    </inferredMetricsTieBreakers>
     <resources>
         <image name="logo" width="512.00701904296875" height="512.00701904296875"/>
         <image name="person" catalog="system" width="128" height="117"/>

@@ -8,7 +8,7 @@
 import UIKit
 import FirebaseAuth
 
-class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
+class UpdateProfileVC: UITableViewController {
     @IBOutlet weak var currentName: UILabel!
     @IBOutlet weak var currentEmail: UILabel!
     @IBOutlet weak var newNameField: UITextField!
@@ -22,6 +22,7 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
         setupElements()
     }
     
+    // MARK: - Helper Functions
     func setupElements() {
         title = toggle ? "Chnage Name or Email" : "Change Password"
         currentName.text = Auth.auth().currentUser?.displayName
@@ -35,71 +36,11 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
     }
     
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return section == 0 ? 1.0 : 32
-    }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 6
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let profileHiddenRows = [4, 5]
-        let passwordHiddenRows = [0, 1, 2, 3]
-        
-        if toggle {
-            if profileHiddenRows.contains(indexPath.row) {
-                return 0
-            }
-        } else {
-            if passwordHiddenRows.contains(indexPath.row) {
-                return 0
-            }
-        }
-        
-        return super.tableView(tableView, heightForRowAt: indexPath)
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if toggle {
-            textField.resignFirstResponder()
-        } else {
-            switch textField {
-            case newPasswordField:
-                confirmPasswordField.becomeFirstResponder()
-            default:
-                confirmPasswordField.resignFirstResponder()
-            }
-        }
-        
-        return true
-    }
-    
-    func textField(
-        _ textField: UITextField,
-        shouldChangeCharactersIn range: NSRange,
-        replacementString string: String
-    ) -> Bool {
-        let oldText = textField.text!
-        let stringRange = Range(range, in: oldText)!
-        let newText = oldText.replacingCharacters(
-            in: stringRange,
-            with: string)
-        if newText.isEmpty {
-            doneButton.isEnabled = false
-        } else {
-            doneButton.isEnabled = true
-        }
-        return true
-    }
-    
-    func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        doneButton.isEnabled = false
-        return true
-    }
-    
-    @objc func hideKeyboard() {
-        self.view.endEditing(true)
+    func resetFields() {
+        newNameField.text = ""
+        newEmailField.text = ""
+        newPasswordField.text = ""
+        confirmPasswordField.text = ""
     }
     
     func showAlert(title: String, message: String) {
@@ -109,13 +50,7 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
         resetFields()
     }
     
-    func resetFields() {
-        newNameField.text = ""
-        newEmailField.text = ""
-        newPasswordField.text = ""
-        confirmPasswordField.text = ""
-    }
-    
+    // MARK: - Actions
     @IBAction func doneTapped(_ sender: UIBarButtonItem) {
         if toggle {
             let newName = newNameField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -158,5 +93,76 @@ class UpdateProfileVC: UITableViewController, UITextFieldDelegate {
         }
         
         navigationController?.popViewController(animated: true)
+    }
+    
+    // MARK: - Table View Data Source
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 6
+    }
+    
+    // MARK: - Table View Delegate
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let profileHiddenRows = [4, 5]
+        let passwordHiddenRows = [0, 1, 2, 3]
+        
+        if toggle {
+            if profileHiddenRows.contains(indexPath.row) {
+                return 0
+            }
+        } else {
+            if passwordHiddenRows.contains(indexPath.row) {
+                return 0
+            }
+        }
+        
+        return super.tableView(tableView, heightForRowAt: indexPath)
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return section == 0 ? 1.0 : 32
+    }
+}
+
+extension UpdateProfileVC: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if toggle {
+            textField.resignFirstResponder()
+        } else {
+            switch textField {
+            case newPasswordField:
+                confirmPasswordField.becomeFirstResponder()
+            default:
+                confirmPasswordField.resignFirstResponder()
+            }
+        }
+        
+        return true
+    }
+    
+    func textField(
+        _ textField: UITextField,
+        shouldChangeCharactersIn range: NSRange,
+        replacementString string: String
+    ) -> Bool {
+        let oldText = textField.text!
+        let stringRange = Range(range, in: oldText)!
+        let newText = oldText.replacingCharacters(
+            in: stringRange,
+            with: string)
+        if newText.isEmpty {
+            doneButton.isEnabled = false
+        } else {
+            doneButton.isEnabled = true
+        }
+        return true
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        doneButton.isEnabled = false
+        return true
+    }
+    
+    @objc func hideKeyboard() {
+        self.view.endEditing(true)
     }
 }
