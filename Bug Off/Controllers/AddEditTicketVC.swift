@@ -9,7 +9,7 @@ import UIKit
 import FirebaseAuth
 
 protocol AddEditTicketVCDelegate: AnyObject {
-    func addEditTicketVC(_ controller: AddEditTicketVC, didFinishAdding ticket: TicketElement)
+    func addEditTicketVC(_ controller: AddEditTicketVC, didFinishAdding ticket: Ticket)
 }
 
 class AddEditTicketVC: UITableViewController {
@@ -23,7 +23,7 @@ class AddEditTicketVC: UITableViewController {
     
     weak var delegate: AddEditTicketVCDelegate?
     var priority: String?
-    var ticket: TicketElement?
+    var ticket: Ticket?
     var update: (() -> Void)?
     var ticketRowIdx: Int?
     
@@ -33,29 +33,33 @@ class AddEditTicketVC: UITableViewController {
     }
     
     // MARK: - Add Ticket (API)
-    func addTicket(ticket: TicketElement) {
+    func addTicket(ticket: Ticket) {
         var request = URLRequest(url: URL(string: URI)!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         let sessionConfiguration = URLSessionConfiguration.default
         
-        Auth.auth().currentUser?.getIDToken() {idToken, error in
+        guard let currentUser = Auth.auth().currentUser else { return }
+        
+        currentUser.getIDToken() {idToken, error in
             if let error = error {
                 print("Error: \(error)")
             }
             
+            guard let idToken = idToken else { return }
+            
             sessionConfiguration.httpAdditionalHeaders = [
-                "Authorization": "Bearer \(idToken!)"
+                "Authorization": "Bearer \(idToken)"
             ]
             
-            let userObject = Ticket(id: Auth.auth().currentUser!.uid, email: Auth.auth().currentUser!.email!, tickets: [ticket], createdAt: ticket.createdAt, updatedAt: ticket.updatedAt)
+            let userObject = User(id: currentUser.uid, email: currentUser.email!, tickets: [ticket], createdAt: ticket.createdAt, updatedAt: ticket.updatedAt)
             
             request.httpBody = try? JSONEncoder().encode(userObject)
             
             URLSession(configuration: sessionConfiguration).dataTask(with: request) { (data, _, error) in
                 if let data = data {
                     do {
-                        let _ = try JSONDecoder().decode(TicketElement.self, from: data)
+                        let _ = try JSONDecoder().decode(Ticket.self, from: data)
                     } catch {
                         print(error)
                     }
@@ -65,22 +69,26 @@ class AddEditTicketVC: UITableViewController {
     }
     
     // MARK: - Edit Ticket (API)
-    func editTicket(ticket: TicketElement) {
+    func editTicket(ticket: Ticket) {
         var request = URLRequest(url: URL(string: URI + "/\(ticket.id)")!)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         let sessionConfiguration = URLSessionConfiguration.default
         
-        Auth.auth().currentUser?.getIDToken() {idToken, error in
+        guard let currentUser = Auth.auth().currentUser else { return }
+        
+        currentUser.getIDToken() {idToken, error in
             if let error = error {
                 print("Error: \(error)")
             }
             
+            guard let idToken = idToken else { return }
+            
             sessionConfiguration.httpAdditionalHeaders = [
-                "Authorization": "Bearer \(idToken!)"
+                "Authorization": "Bearer \(idToken)"
             ]
             
-            let userObject = Ticket(id: Auth.auth().currentUser!.uid, email: Auth.auth().currentUser!.email!, tickets: [ticket], createdAt: ticket.createdAt, updatedAt: ticket.updatedAt)
+            let userObject = User(id: currentUser.uid, email: currentUser.email!, tickets: [ticket], createdAt: ticket.createdAt, updatedAt: ticket.updatedAt)
             
             request.httpBody = try? JSONEncoder().encode(userObject)
             
@@ -94,35 +102,36 @@ class AddEditTicketVC: UITableViewController {
     
     // MARK: - Helper Functions
     func setupElements() {
-        Utilities.styleTextView(summaryField)
+        guard let ticket = ticket else {
+            Utilities.styleTextView(summaryField)
+            titleField.delegate = self
+            summaryField.delegate = self
+            self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
+            
+            return
+        }
+
         
-        if ticket != nil {
-            titleField.text = ticket?.title
-            summaryField.text = ticket?.summary
-            
-            if ticket?.priority == "Low" {
-                priorityControl.selectedSegmentIndex = 0
-                priority = "Low"
-            } else if ticket?.priority == "Medium" {
-                priorityControl.selectedSegmentIndex = 1
-                priority = "Medium"
-            } else {
-                priorityControl.selectedSegmentIndex = 2
-                priority = "High"
-            }
-            
-            if ticket?.dueDate != "" {
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-                let formattedDate = dateFormatter.date(from: ticket!.dueDate)!
-                dueDatePicker.date = formattedDate
-            }
+        titleField.text = ticket.title
+        summaryField.text = ticket.summary
+        
+        if ticket.priority == "Low" {
+            priorityControl.selectedSegmentIndex = 0
+            priority = "Low"
+        } else if ticket.priority == "Medium" {
+            priorityControl.selectedSegmentIndex = 1
+            priority = "Medium"
+        } else {
+            priorityControl.selectedSegmentIndex = 2
+            priority = "High"
         }
         
-        titleField.delegate = self
-        summaryField.delegate = self
         
-        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let formattedDate = dateFormatter.date(from: ticket.dueDate)!
+        dueDatePicker.date = formattedDate
+        
     }
     
     func validateFields() -> String? {
@@ -186,7 +195,7 @@ class AddEditTicketVC: UITableViewController {
             let title = titleField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             let summary = summaryField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             
-            let ticket = TicketElement(id: id, status: "open", submittedBy: Auth.auth().currentUser?.displayName ?? "Self", assignedTo: "Self", title: title, summary: summary, priority: priority ?? "Low", dueDate: dueDate, createdAt: createdAt, updatedAt: updatedAt)
+            let ticket = Ticket(id: id, status: "open", submittedBy: Auth.auth().currentUser?.displayName ?? "Self", assignedTo: "Self", title: title, summary: summary, priority: priority ?? "Low", dueDate: dueDate, createdAt: createdAt, updatedAt: updatedAt)
             
             if self.ticket != nil {
                 openTickets.remove(at: ticketRowIdx!)

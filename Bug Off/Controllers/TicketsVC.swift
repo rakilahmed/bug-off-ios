@@ -8,8 +8,8 @@
 import UIKit
 import FirebaseAuth
 
-var openTickets = [TicketElement]()
-var closedTickets = [TicketElement]()
+var openTickets = [Ticket]()
+var closedTickets = [Ticket]()
 
 class TicketsVC: UITableViewController, AddEditTicketVCDelegate, ViewTicketVCDelegate {
     @IBOutlet weak var openClosedControl: UISegmentedControl!
@@ -40,20 +40,24 @@ class TicketsVC: UITableViewController, AddEditTicketVCDelegate, ViewTicketVCDel
         let request = URLRequest(url: URL(string: "https://bugoff.rakilahmed.com/api/tickets")!)
         let sessionConfiguration = URLSessionConfiguration.default
         
-        Auth.auth().currentUser?.getIDToken() {idToken, error in
+        guard let currentUser = Auth.auth().currentUser else { return }
+        
+        currentUser.getIDToken() {idToken, error in
             if let error = error {
                 print("Error: \(error)")
             }
             
+            guard let idToken = idToken else { return }
+            
             sessionConfiguration.httpAdditionalHeaders = [
-                "Authorization": "Bearer \(idToken!)"
+                "Authorization": "Bearer \(idToken)"
             ]
             
             URLSession(configuration: sessionConfiguration).dataTask(with: request) { (data, _, error) in
                 if let data = data {
                     do {
                         let decoder = JSONDecoder()
-                        let userObject = try decoder.decode([Ticket].self, from: data)
+                        let userObject = try decoder.decode([User].self, from: data)
                         
                         if userObject.count > 0 {
                             openTickets = userObject[0].tickets.filter { ticket in
@@ -123,14 +127,14 @@ class TicketsVC: UITableViewController, AddEditTicketVCDelegate, ViewTicketVCDel
         
         if ticketsToDisplay.count > 0 {
             if segmentOption == "open" {
-                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].dueDate, priority: ticketsToDisplay[indexPath.row].priority)
+                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].dueDate, priority: ticketsToDisplay[indexPath.row].priority, closedTicket: false)
                 cell.accessoryType = .disclosureIndicator
             } else {
-                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].updatedAt, priority: ticketsToDisplay[indexPath.row].priority)
+                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].updatedAt, priority: ticketsToDisplay[indexPath.row].priority, closedTicket: true)
                 cell.accessoryType = .disclosureIndicator
             }
         } else {
-            cell.configure(with: "No \(segmentOption) tickets to show...", status: "", date: "", priority: "")
+            cell.configure(with: "No \(segmentOption) tickets to show...", status: "", date: "", priority: "", closedTicket: false)
             cell.accessoryType = .none
         }
         
@@ -158,7 +162,7 @@ class TicketsVC: UITableViewController, AddEditTicketVCDelegate, ViewTicketVCDel
     }
     
     // MARK: - AddEditTicketVC Delegate
-    func addEditTicketVC(_ controller: AddEditTicketVC, didFinishAdding ticket: TicketElement) {
+    func addEditTicketVC(_ controller: AddEditTicketVC, didFinishAdding ticket: Ticket) {
         updateTickets()
         navigationController?.popViewController(animated: true)
     }

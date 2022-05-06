@@ -24,7 +24,7 @@ class ViewTicketVC: UITableViewController {
     let URI = "https://bugoff.rakilahmed.com/api/tickets"
     
     weak var delegate: ViewTicketVCDelegate?
-    var ticket: TicketElement?
+    var ticket: Ticket?
     var ticketRowIdx: Int?
     var segmentIdx: Int?
     var update: (() -> Void)?
@@ -72,7 +72,7 @@ class ViewTicketVC: UITableViewController {
     }
     
     // MARK: - Close Ticket (API)
-    func updateTicketStatus(ticket: TicketElement) {
+    func updateTicketStatus(ticket: Ticket) {
         var request = URLRequest(url: URL(string: URI + "/\(ticket.id)")!)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -87,7 +87,7 @@ class ViewTicketVC: UITableViewController {
                 "Authorization": "Bearer \(idToken!)"
             ]
             
-            let userObject = Ticket(id: Auth.auth().currentUser!.uid, email: Auth.auth().currentUser!.email!, tickets: [ticket], createdAt: ticket.createdAt, updatedAt: ticket.updatedAt)
+            let userObject = User(id: Auth.auth().currentUser!.uid, email: Auth.auth().currentUser!.email!, tickets: [ticket], createdAt: ticket.createdAt, updatedAt: ticket.updatedAt)
             
             request.httpBody = try? JSONEncoder().encode(userObject)
             
@@ -106,35 +106,24 @@ class ViewTicketVC: UITableViewController {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 600
         
-        titleLabel.text = ticket?.title
-        summaryLabel.text = ticket?.summary
-        priorityLable.text = ticket?.priority
+        guard let ticket = ticket else { return }
+        
+        titleLabel.text = ticket.title
+        summaryLabel.text = ticket.summary
+        priorityLable.text = ticket.priority
         
         Utilities.stylePriorityTextLabel(priorityLable)
         
-        if ticket?.dueDate != "" {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-            let formattedDate = dateFormatter.date(from:  ticket!.dueDate)!
-            dateFormatter.dateFormat = "MMM d, h:mm a"
-            dueDateLabel.text = dateFormatter.string(from: formattedDate)
-        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let formattedDueDate = dateFormatter.date(from:  ticket.dueDate)!
+        let formattedCreatedAt = dateFormatter.date(from:  ticket.createdAt)!
+        let formattedUpdatedAt = dateFormatter.date(from:  ticket.updatedAt)!
+        dateFormatter.dateFormat = "MMM d, h:mm a"
         
-        if ticket?.createdAt != "" {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-            let formattedDate = dateFormatter.date(from:  ticket!.createdAt)!
-            dateFormatter.dateFormat = "MMM d, h:mm a"
-            createdAtLabel.text = dateFormatter.string(from: formattedDate)
-        }
-        
-        if ticket?.updatedAt != "" {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-            let formattedDate = dateFormatter.date(from:  ticket!.updatedAt)!
-            dateFormatter.dateFormat = "MMM d, h:mm a"
-            updatedAtLabel.text = dateFormatter.string(from: formattedDate)
-        }
+        dueDateLabel.text = dateFormatter.string(from: formattedDueDate)
+        createdAtLabel.text = dateFormatter.string(from: formattedCreatedAt)
+        updatedAtLabel.text = dateFormatter.string(from: formattedUpdatedAt)
         
         if segmentIdx == 1 {
             ticketStatusButton.setTitle("RESTORE", for: .normal)
@@ -160,7 +149,7 @@ class ViewTicketVC: UITableViewController {
         
         let ticketStatus = segmentIdx == 0 ? "closed" : "open"
         
-        let ticket = TicketElement(id: ticket!.id, status: ticketStatus, submittedBy: ticket!.submittedBy, assignedTo: ticket!.assignedTo, title: ticket!.title, summary: ticket!.summary, priority: ticket!.priority, dueDate: ticket!.dueDate, createdAt: ticket!.createdAt, updatedAt: updatedAtDate)
+        let ticket = Ticket(id: ticket!.id, status: ticketStatus, submittedBy: ticket!.submittedBy, assignedTo: ticket!.assignedTo, title: ticket!.title, summary: ticket!.summary, priority: ticket!.priority, dueDate: ticket!.dueDate, createdAt: ticket!.createdAt, updatedAt: updatedAtDate)
         
         updateTicketStatus(ticket: ticket)
         

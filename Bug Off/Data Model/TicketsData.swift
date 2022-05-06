@@ -7,10 +7,10 @@
 
 import Foundation
 
-// MARK: - Ticket
-struct Ticket: Codable {
+// MARK: - User
+struct User: Codable {
     let id, email: String
-    let tickets: [TicketElement]
+    let tickets: [Ticket]
     let createdAt, updatedAt: String
 
     enum CodingKeys: String, CodingKey {
@@ -21,8 +21,8 @@ struct Ticket: Codable {
     }
 }
 
-// MARK: - TicketElement
-struct TicketElement: Codable {
+// MARK: - Ticket
+struct Ticket: Codable {
     let id: Int
     let status, submittedBy, assignedTo: String
     let title, summary, priority: String

@@ -51,6 +51,8 @@ class Utilities {
             label.layer.backgroundColor = UIColor.init(red: 243/255, green: 191/255, blue: 51/255, alpha: 1).cgColor
         } else if label.text == "High" {
             label.layer.backgroundColor = UIColor.init(red: 215/255, green: 59/255, blue: 48/255, alpha: 1).cgColor
+        } else if label.text == "Overdue" {
+            label.layer.backgroundColor = UIColor.init(red: 48/255, green: 48/255, blue: 56/255, alpha: 1).cgColor
         } else {
             label.layer.backgroundColor = .none
         }

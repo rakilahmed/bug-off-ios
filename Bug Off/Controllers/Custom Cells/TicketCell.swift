@@ -18,19 +18,18 @@ class TicketCell: UITableViewCell {
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var priorityLabel: UILabel!
     
-    public func configure(with title: String, status: String, date: String, priority: String) {
-        var finalDate = ""
-        if date != "" {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-            let formattedDate = dateFormatter.date(from: date)!
-            dateFormatter.dateFormat = "MMM d, h:mm a"
-            finalDate = dateFormatter.string(from: formattedDate)
-        }
+    public func configure(with title: String, status: String, date: String, priority: String, closedTicket: Bool) {
+        if date == "" { return }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let formattedDate = dateFormatter.date(from: date)!
+        dateFormatter.dateFormat = "MMM d, h:mm a"
+        let finalDate = dateFormatter.string(from: formattedDate)
         
         titleLabel.text = title
-        dateLabel.text = date != "" ? (status == "open" ? "Due: " + finalDate : "Closed At: " + finalDate) : ""
-        priorityLabel.text = priority
+        dateLabel.text = status == "open" ? "Due: " + finalDate : "Closed At: " + finalDate
+        priorityLabel.text = formattedDate < Date() && !closedTicket ? "Overdue" : priority
         
         Utilities.stylePriorityTextLabel(priorityLabel)
     }
