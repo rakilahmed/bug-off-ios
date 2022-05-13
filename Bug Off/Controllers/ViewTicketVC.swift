@@ -140,7 +140,7 @@ class ViewTicketVC: UITableViewController {
         } else {
             closedTickets.remove(at: ticketRowIdx!)
         }
-    
+        
         delegate?.viewTicketVC(self)
     }
     
@@ -149,7 +149,7 @@ class ViewTicketVC: UITableViewController {
         let ticketStatus = segmentIdx == 0 ? "closed" : "open"
         
         let ticket = Ticket(id: ticket!.id, status: ticketStatus, submittedBy: ticket!.submittedBy, assignedTo: ticket!.assignedTo, assigneeEmail: ticket!.assigneeEmail, title: ticket!.title, summary: ticket!.summary, priority: ticket!.priority, dueDate: ticket!.dueDate, createdAt: ticket!.createdAt, updatedAt: updatedAtDate)
-    
+        
         UserDefaults.standard.removeObject(forKey: "\(ticket.id)")
         updateTicket(ticket: ticket)
         
@@ -170,7 +170,7 @@ class ViewTicketVC: UITableViewController {
         let updatedAtDate = Utilities.convertDateToString(date: Date())
         
         let ticket = Ticket(id: ticket!.id, status: ticket!.status, submittedBy: ticket!.submittedBy, assignedTo: ticket!.assignedTo, assigneeEmail: ticket!.assigneeEmail, title: ticket!.title, summary: ticket!.summary, priority: ticket!.priority, dueDate: newDueDate, createdAt: ticket!.createdAt, updatedAt: updatedAtDate)
-    
+        
         UserDefaults.standard.removeObject(forKey: "\(ticket.id)")
         
         openTickets.remove(at: ticketRowIdx!)
@@ -196,8 +196,7 @@ class ViewTicketVC: UITableViewController {
         }
         
         let hoursLeft = Calendar.current.dateComponents([.hour], from: Date(), to: Utilities.convertStringToDate(date: ticket!.dueDate)).hour!
-        
-    return segmentIdx == 0 && priorityLable.text != "Overdue" && hoursLeft == 0 ? 2 : 1
+        return segmentIdx == 0 && priorityLable.text != "Overdue" && hoursLeft == 0 ? 2 : 1
     }
     
     // MARK: - Table View Delegate

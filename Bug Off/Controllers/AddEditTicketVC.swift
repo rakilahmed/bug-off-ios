@@ -113,7 +113,7 @@ class AddEditTicketVC: UITableViewController {
             
             return
         }
-
+        
         
         titleField.text = ticket.title
         summaryField.text = ticket.summary

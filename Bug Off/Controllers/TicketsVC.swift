@@ -124,7 +124,7 @@ class TicketsVC: UITableViewController, AddEditTicketVCDelegate, ViewTicketVCDel
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let segmentOption = openClosedControl.selectedSegmentIndex == 0 ? "open" : "closed"
         let cell = tableView.dequeueReusableCell(withIdentifier: TicketCell.identifier, for: indexPath) as! TicketCell
-                        
+        
         if ticketsToDisplay.count > 0 {
             let remindMe = UserDefaults.standard.bool(forKey: "\(ticketsToDisplay[indexPath.row].id)")
             
