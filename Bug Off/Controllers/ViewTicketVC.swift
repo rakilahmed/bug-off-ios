@@ -17,6 +17,7 @@ class ViewTicketVC: UITableViewController {
     @IBOutlet weak var summaryLabel: UILabel!
     @IBOutlet weak var priorityLable: UILabel!
     @IBOutlet weak var dueDateLabel: UILabel!
+    @IBOutlet weak var remindMeLabel: UILabel!
     @IBOutlet weak var createdAtLabel: UILabel!
     @IBOutlet weak var updatedAtLabel: UILabel!
     @IBOutlet weak var ticketStatusButton: UIButton!
@@ -114,16 +115,15 @@ class ViewTicketVC: UITableViewController {
         
         Utilities.stylePriorityTextLabel(priorityLable)
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        let formattedDueDate = dateFormatter.date(from:  ticket.dueDate)!
-        let formattedCreatedAt = dateFormatter.date(from:  ticket.createdAt)!
-        let formattedUpdatedAt = dateFormatter.date(from:  ticket.updatedAt)!
-        dateFormatter.dateFormat = "MMM d, h:mm a"
+        let formattedDueDate = Utilities.convertStringToDate(date: ticket.dueDate)
+        let formattedCreatedAt = Utilities.convertStringToDate(date: ticket.createdAt)
+        let formattedUpdatedAt = Utilities.convertStringToDate(date: ticket.updatedAt)
         
-        dueDateLabel.text = dateFormatter.string(from: formattedDueDate)
-        createdAtLabel.text = dateFormatter.string(from: formattedCreatedAt)
-        updatedAtLabel.text = dateFormatter.string(from: formattedUpdatedAt)
+        dueDateLabel.text = Utilities.modifyDateLook(date: formattedDueDate)
+        remindMeLabel.text = UserDefaults.standard.bool(forKey: "\(ticket.id)") ? "Yes" : "No"
+        
+        createdAtLabel.text = Utilities.modifyDateLook(date: formattedCreatedAt)
+        updatedAtLabel.text = Utilities.modifyDateLook(date: formattedUpdatedAt)
         
         if segmentIdx == 1 {
             ticketStatusButton.setTitle("RESTORE", for: .normal)
@@ -133,24 +133,24 @@ class ViewTicketVC: UITableViewController {
     // MARK: - Actions
     @IBAction func deleteTapped(_ sender: UIButton) {
         deleteTicket(ticketID: ticket!.id)
+        Utilities.removeNotification(ticketID: ticket!.id)
+        
         if segmentIdx == 0 {
             openTickets.remove(at: ticketRowIdx!)
         } else {
             closedTickets.remove(at: ticketRowIdx!)
         }
-        
+    
         delegate?.viewTicketVC(self)
     }
     
     @IBAction func ticketStatusTapped(_ sender: UIButton) {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        let updatedAtDate = dateFormatter.string(from: Date())
-        
+        let updatedAtDate = Utilities.convertDateToString(date: Date())
         let ticketStatus = segmentIdx == 0 ? "closed" : "open"
         
-        let ticket = Ticket(id: ticket!.id, status: ticketStatus, submittedBy: ticket!.submittedBy, assignedTo: ticket!.assignedTo, title: ticket!.title, summary: ticket!.summary, priority: ticket!.priority, dueDate: ticket!.dueDate, createdAt: ticket!.createdAt, updatedAt: updatedAtDate)
-        
+        let ticket = Ticket(id: ticket!.id, status: ticketStatus, submittedBy: ticket!.submittedBy, assignedTo: ticket!.assignedTo, assigneeEmail: ticket!.assigneeEmail, title: ticket!.title, summary: ticket!.summary, priority: ticket!.priority, dueDate: ticket!.dueDate, createdAt: ticket!.createdAt, updatedAt: updatedAtDate)
+    
+        UserDefaults.standard.removeObject(forKey: "\(ticket.id)")
         updateTicketStatus(ticket: ticket)
         
         if segmentIdx == 1 {
@@ -165,15 +165,21 @@ class ViewTicketVC: UITableViewController {
     }
     
     // MARK: - Table View Data Source
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 3
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 7
+        if section == 0 {
+            return 5
+        } else if section == 1 {
+            return 2
+        }
+        
+        return 1
     }
     
     // MARK: - Table View Delegate
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return section == 0 ? 1.0 : 32
-    }
-    
     override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }

@@ -124,17 +124,19 @@ class TicketsVC: UITableViewController, AddEditTicketVCDelegate, ViewTicketVCDel
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let segmentOption = openClosedControl.selectedSegmentIndex == 0 ? "open" : "closed"
         let cell = tableView.dequeueReusableCell(withIdentifier: TicketCell.identifier, for: indexPath) as! TicketCell
-        
+                        
         if ticketsToDisplay.count > 0 {
+            let remindMe = UserDefaults.standard.bool(forKey: "\(ticketsToDisplay[indexPath.row].id)")
+            
             if segmentOption == "open" {
-                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].dueDate, priority: ticketsToDisplay[indexPath.row].priority, closedTicket: false)
+                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].dueDate, priority: ticketsToDisplay[indexPath.row].priority, closedTicket: false, notify: remindMe)
                 cell.accessoryType = .disclosureIndicator
             } else {
-                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].updatedAt, priority: ticketsToDisplay[indexPath.row].priority, closedTicket: true)
+                cell.configure(with: ticketsToDisplay[indexPath.row].title, status: segmentOption, date: ticketsToDisplay[indexPath.row].updatedAt, priority: ticketsToDisplay[indexPath.row].priority, closedTicket: true, notify: false)
                 cell.accessoryType = .disclosureIndicator
             }
         } else {
-            cell.configure(with: "No \(segmentOption) tickets to show...", status: "", date: "", priority: "", closedTicket: false)
+            cell.configure(with: "No \(segmentOption) tickets to show...", status: "", date: "", priority: "", closedTicket: false, notify: false)
             cell.accessoryType = .none
         }
         

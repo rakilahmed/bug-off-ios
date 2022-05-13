@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseAuth
+import UserNotifications
 
 protocol AddEditTicketVCDelegate: AnyObject {
     func addEditTicketVC(_ controller: AddEditTicketVC, didFinishAdding ticket: Ticket)
@@ -18,6 +19,7 @@ class AddEditTicketVC: UITableViewController {
     @IBOutlet weak var priorityControl: UISegmentedControl!
     @IBOutlet weak var doneButton: UIBarButtonItem!
     @IBOutlet weak var dueDatePicker: UIDatePicker!
+    @IBOutlet weak var shouldRemind: UISwitch!
     
     let URI = "https://bugoff.rakilahmed.com/api/tickets"
     
@@ -126,12 +128,10 @@ class AddEditTicketVC: UITableViewController {
             priority = "High"
         }
         
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        let formattedDate = dateFormatter.date(from: ticket.dueDate)!
+        let formattedDate = Utilities.convertStringToDate(date: ticket.dueDate)
         dueDatePicker.date = formattedDate
         
+        shouldRemind.isOn = UserDefaults.standard.bool(forKey: "\(ticket.id)")
     }
     
     func validateFields() -> String? {
@@ -173,6 +173,13 @@ class AddEditTicketVC: UITableViewController {
         }
     }
     
+    @IBAction func shouldRemindTapped(_ sender: UISwitch) {
+        if shouldRemind.isOn {
+            let center = UNUserNotificationCenter.current()
+            center.requestAuthorization(options: [.alert, .sound]) { _, _ in }
+        }
+    }
+    
     @IBAction func doneTapped(_ sender: UIBarButtonItem) {
         let errorMessage = validateFields()
         
@@ -180,22 +187,30 @@ class AddEditTicketVC: UITableViewController {
             showAlert(title: "Failed to \(title!)", message: errorMessage!)
         } else {
             var id = random(digits: 4)
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-            var createdAt = dateFormatter.string(from: Date())
+            var createdAt = Utilities.convertDateToString(date: Date())
             var updatedAt = createdAt
-            let dueDate = dateFormatter.string(from: dueDatePicker.date)
+            let dueDate = Utilities.convertDateToString(date: dueDatePicker.date)
             
             if ticket != nil {
                 id = ticket!.id
                 createdAt = ticket!.createdAt
-                updatedAt = dateFormatter.string(from: Date())
+                updatedAt = Utilities.convertDateToString(date: Date())
             }
             
             let title = titleField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             let summary = summaryField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             
-            let ticket = Ticket(id: id, status: "open", submittedBy: Auth.auth().currentUser?.displayName ?? "Self", assignedTo: "Self", title: title, summary: summary, priority: priority ?? "Low", dueDate: dueDate, createdAt: createdAt, updatedAt: updatedAt)
+            let ticket = Ticket(id: id, status: "open", submittedBy: Auth.auth().currentUser?.displayName ?? "Self", assignedTo: "Self", assigneeEmail: Auth.auth().currentUser?.email ?? "Self", title: title, summary: summary, priority: priority ?? "Low", dueDate: dueDate, createdAt: createdAt, updatedAt: updatedAt)
+            
+            if shouldRemind.isOn {
+                UserDefaults.standard.set(shouldRemind.isOn, forKey: "\(id)")
+                
+                let notifyTime = Calendar.current.date(byAdding: .hour, value: -1, to: dueDatePicker.date)
+                Utilities.scheduleNotification(shouldRemind: shouldRemind.isOn, notifyTime: notifyTime!, ticketID: id, title: "Due Soon", subtitle: titleField.text!)
+            } else {
+                UserDefaults.standard.removeObject(forKey: "\(id)")
+                Utilities.removeNotification(ticketID: id)
+            }
             
             if self.ticket != nil {
                 openTickets.remove(at: ticketRowIdx!)
@@ -215,7 +230,7 @@ class AddEditTicketVC: UITableViewController {
     
     // MARK: - Table View Data Source
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4
+        return 5
     }
     
     // MARK: - Table View Delegate

@@ -24,7 +24,7 @@ struct User: Codable {
 // MARK: - Ticket
 struct Ticket: Codable {
     let id: Int
-    let status, submittedBy, assignedTo: String
+    let status, submittedBy, assignedTo, assigneeEmail: String
     let title, summary, priority: String
     let dueDate, createdAt, updatedAt: String
 
@@ -33,6 +33,7 @@ struct Ticket: Codable {
         case status
         case submittedBy = "submitted_by"
         case assignedTo = "assigned_to"
+        case assigneeEmail = "assignee_email"
         case title, summary, priority
         case dueDate = "due_date"
         case createdAt = "created_at"
