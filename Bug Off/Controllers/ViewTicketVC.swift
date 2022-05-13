@@ -73,7 +73,7 @@ class ViewTicketVC: UITableViewController {
     }
     
     // MARK: - Close Ticket (API)
-    func updateTicketStatus(ticket: Ticket) {
+    func updateTicket(ticket: Ticket) {
         var request = URLRequest(url: URL(string: URI + "/\(ticket.id)")!)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -151,7 +151,7 @@ class ViewTicketVC: UITableViewController {
         let ticket = Ticket(id: ticket!.id, status: ticketStatus, submittedBy: ticket!.submittedBy, assignedTo: ticket!.assignedTo, assigneeEmail: ticket!.assigneeEmail, title: ticket!.title, summary: ticket!.summary, priority: ticket!.priority, dueDate: ticket!.dueDate, createdAt: ticket!.createdAt, updatedAt: updatedAtDate)
     
         UserDefaults.standard.removeObject(forKey: "\(ticket.id)")
-        updateTicketStatus(ticket: ticket)
+        updateTicket(ticket: ticket)
         
         if segmentIdx == 1 {
             openTickets.append(ticket)
@@ -163,6 +163,25 @@ class ViewTicketVC: UITableViewController {
         
         delegate?.viewTicketVC(self)
     }
+    
+    @IBAction func extendHourTapped(_ sender: UIButton) {
+        let currDueDate = Utilities.convertStringToDate(date: ticket!.dueDate)
+        let newDueDate = Utilities.convertDateToString(date: Calendar.current.date(byAdding: .hour, value: 1, to: currDueDate)!)
+        let updatedAtDate = Utilities.convertDateToString(date: Date())
+        
+        let ticket = Ticket(id: ticket!.id, status: ticket!.status, submittedBy: ticket!.submittedBy, assignedTo: ticket!.assignedTo, assigneeEmail: ticket!.assigneeEmail, title: ticket!.title, summary: ticket!.summary, priority: ticket!.priority, dueDate: newDueDate, createdAt: ticket!.createdAt, updatedAt: updatedAtDate)
+    
+        UserDefaults.standard.removeObject(forKey: "\(ticket.id)")
+        
+        openTickets.remove(at: ticketRowIdx!)
+        updateTicket(ticket: ticket)
+        openTickets.insert(ticket, at: ticketRowIdx!)
+        
+        update!()
+        
+        delegate?.viewTicketVC(self)
+    }
+    
     
     // MARK: - Table View Data Source
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -176,7 +195,9 @@ class ViewTicketVC: UITableViewController {
             return 2
         }
         
-        return 1
+        let hoursLeft = Calendar.current.dateComponents([.hour], from: Date(), to: Utilities.convertStringToDate(date: ticket!.dueDate)).hour!
+        
+    return segmentIdx == 0 && priorityLable.text != "Overdue" && hoursLeft == 0 ? 2 : 1
     }
     
     // MARK: - Table View Delegate

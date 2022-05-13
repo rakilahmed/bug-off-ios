@@ -688,6 +688,33 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="65" id="rYR-Ge-Mev">
+                                        <rect key="frame" x="0.0" y="523.00000381469727" width="390" height="65"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rYR-Ge-Mev" id="BWr-ul-zQq">
+                                            <rect key="frame" x="0.0" y="0.0" width="390" height="65"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cJL-Ty-RXH">
+                                                    <rect key="frame" x="20" y="11" width="350" height="43"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="40" id="En2-kC-pbc"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Button"/>
+                                                    <buttonConfiguration key="configuration" style="tinted" title="NEED 1 MORE HOUR?"/>
+                                                    <connections>
+                                                        <action selector="extendHourTapped:" destination="fzs-PE-np6" eventType="touchUpInside" id="24a-Cw-u0R"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailingMargin" secondItem="cJL-Ty-RXH" secondAttribute="trailing" id="GB6-Hp-nEK"/>
+                                                <constraint firstItem="cJL-Ty-RXH" firstAttribute="top" secondItem="BWr-ul-zQq" secondAttribute="topMargin" id="IUW-Ur-IRO"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="cJL-Ty-RXH" secondAttribute="bottom" id="u4G-TX-IeF"/>
+                                                <constraint firstItem="cJL-Ty-RXH" firstAttribute="leading" secondItem="BWr-ul-zQq" secondAttribute="leadingMargin" id="wRa-uG-Lyy"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
