@@ -104,8 +104,9 @@ class AddEditTicketVC: UITableViewController {
     
     // MARK: - Helper Functions
     func setupElements() {
+        Utilities.styleTextView(summaryField)
+        
         guard let ticket = ticket else {
-            Utilities.styleTextView(summaryField)
             titleField.delegate = self
             summaryField.delegate = self
             self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
