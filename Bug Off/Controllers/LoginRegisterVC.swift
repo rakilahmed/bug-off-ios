@@ -147,6 +147,27 @@ class LoginRegisterVC: UITableViewController {
         }
     }
     
+    @IBAction func forgotPasswordTapped(_ sender: UIButton) {
+        let alertController = UIAlertController(title: "Reset Password", message: "\nEnter your email address and we will send you a link to reset your password. Check your spam folder if you don't receive an email.", preferredStyle: UIAlertController.Style.alert)
+        alertController.addTextField { (textField : UITextField!) -> Void in
+            textField.placeholder = "Email"
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertAction.Style.default, handler: {
+            (action : UIAlertAction!) -> Void in })
+        
+        let submitAction = UIAlertAction(title: "Submit", style: UIAlertAction.Style.default, handler: { alert -> Void in
+            let resetEmailField = alertController.textFields![0] as UITextField
+            let email = resetEmailField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
+            Auth.auth().sendPasswordReset(withEmail: email)
+        })
+        
+        alertController.addAction(cancelAction)
+        alertController.addAction(submitAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     // MARK: - Table View Data Source
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 8
