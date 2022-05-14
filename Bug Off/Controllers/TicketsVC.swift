@@ -163,6 +163,14 @@ class TicketsVC: UITableViewController, AddEditTicketVCDelegate, ViewTicketVCDel
         return 65
     }
     
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.alpha = 0
+
+        UIView.animate(withDuration: 0.75) {
+            cell.alpha = 1
+        }
+    }
+    
     // MARK: - AddEditTicketVC Delegate
     func addEditTicketVC(_ controller: AddEditTicketVC, didFinishAdding ticket: Ticket) {
         updateTickets()
